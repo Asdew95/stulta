@@ -1,0 +1,4 @@
+*.o
+iso/boot/stulta.elf
+*.iso
+*.iso.lock
