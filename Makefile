@@ -32,7 +32,7 @@ $(KERNEL_ELF): $(OBJ)
 
 build/%.s.o: src/%.s
 	@mkdir -p build
-	$(AS) $(ASFLAGS) $< -o $@
+	$(AS) $(ASFLAGS) -MD -MP -MF build/$*.s.d $< -o $@
 
 build/%.c.o: src/%.c
 	@mkdir -p build
