@@ -1,5 +1,9 @@
-OBJ = boot.s.o kentry.c.o
-OUT = stulta.iso
+SRC_FILES = boot.s kentry.c
+DEPS = $(addprefix build/, $(addsuffix .d, $(SRC_FILES)))
+OBJ = $(addprefix build/, $(addsuffix .o, $(SRC_FILES)))
+SRC = $(addprefix src/, $(SRC_FILES))
+KERNEL_ELF = build/iso/boot/stulta.elf
+OUT = build/stulta.iso
 
 AS = nasm
 CC = clang
@@ -13,21 +17,30 @@ LDFLAGS = -T link.ld -melf_i386
 
 all: $(OUT)
 
-$(OUT): iso/boot/stulta.elf
-	grub-mkrescue -o $@ iso/
+$(OUT): $(KERNEL_ELF) build/iso/boot/grub/grub.cfg
+	grub-mkrescue -o $@ build/iso/
 
-iso/boot/stulta.elf: $(OBJ)
+build/iso/boot/grub/grub.cfg: grub.cfg
+	@mkdir -p build/iso/boot/grub
+	cp grub.cfg build/iso/boot/grub/
+
+$(KERNEL_ELF): $(OBJ)
+	@mkdir -p build/iso/boot
 	$(LD) $(LDFLAGS) $(OBJ) -o $@
 
-%.s.o: %.s
+-include $(DEPS)
+
+build/%.s.o: src/%.s
+	@mkdir -p build
 	$(AS) $(ASFLAGS) $< -o $@
 
-%.c.o: %.c
-	$(CC) $(CFLAGS) $< -o $@
+build/%.c.o: src/%.c
+	@mkdir -p build
+	$(CC) $(CFLAGS) -MMD -MP $< -o $@
 
 run: $(OUT)
 	rm -f $(OUT).lock
 	bochs -f bochsrc -q
 
 clean:
-	rm -f $(OUT) iso/boot/stulta.elf $(OBJ)
+	rm -rf build/
