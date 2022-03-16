@@ -8,7 +8,7 @@ OUT = build/stulta.iso
 AS = nasm
 CC = clang
 LD = ld.lld
-ASFLAGS = -f elf32
+ASFLAGS = -f elf32 -Werror
 CFLAGS = -c -ffreestanding -fno-builtin -nostdlib -Wall -Wextra -Werror \
 		 --target=i686-pc-none-elf -march=i686
 LDFLAGS = -T link.ld -melf_i386
