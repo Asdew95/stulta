@@ -1,4 +1,7 @@
 #include "gdt.h"
+#include "idt.h"
+#include "interrupt.h"
+#include "pic.h"
 
 void kentry(void)
 {
@@ -6,4 +9,7 @@ void kentry(void)
     fb[0] = 'A';
 
     gdt_init();
+    idt_init();
+    pic_init();
+    interrupts_enable();
 }
