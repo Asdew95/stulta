@@ -1,5 +1,5 @@
 SRC_FILES = boot.s gdt.c gdt.s idt.c idt.s interrupt.c interrupt.s io.s \
-			pic.c kentry.c
+			pic.c kentry.c vmm.c vmm.s
 DEPS = $(addprefix build/, $(addsuffix .d, $(SRC_FILES)))
 OBJ = $(addprefix build/, $(addsuffix .o, $(SRC_FILES)))
 SRC = $(addprefix src/, $(SRC_FILES))

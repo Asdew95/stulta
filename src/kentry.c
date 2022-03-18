@@ -2,6 +2,7 @@
 #include "idt.h"
 #include "interrupt.h"
 #include "pic.h"
+#include "vmm.h"
 
 void kentry(void)
 {
@@ -12,4 +13,5 @@ void kentry(void)
     idt_init();
     pic_init();
     interrupts_enable();
+    vmm_init();
 }

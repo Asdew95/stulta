@@ -22,7 +22,11 @@ dd FLAGS
 dd CHECKSUM
 
 asentry:
-    xchg bx, bx
+    ; Enable PSE
+    mov eax, cr4
+    or eax, 0x00000010
+    mov cr4, eax
+
     mov esp, kernel_stack + KERNEL_STACK_SIZE
     mov al, '!'
     mov [0xb8000], al
