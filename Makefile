@@ -25,7 +25,7 @@ build/iso/boot/grub/grub.cfg: grub.cfg
 	@mkdir -p build/iso/boot/grub
 	cp grub.cfg build/iso/boot/grub/
 
-$(KERNEL_ELF): $(OBJ)
+$(KERNEL_ELF): $(OBJ) link.ld
 	@mkdir -p build/iso/boot
 	$(LD) $(LDFLAGS) $(OBJ) -o $@
 
