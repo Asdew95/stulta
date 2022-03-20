@@ -1,4 +1,5 @@
 magic_break: enabled=1
+port_e9_hack: enabled=1
 display_library: x, options="gui_debug"
 ata0: enabled=1
 ata0-master: type=disk, path="build/stulta.iso", status=inserted
