@@ -1,5 +1,5 @@
 SRC_FILES = boot.s gdt.c gdt.s idt.c idt.s interrupt.c interrupt.s io.s \
-			kentry.c pic.c vmm.c vmm.s
+			kentry.c pic.c pmm.c vmm.c vmm.s
 DEPS = $(addprefix build/, $(addsuffix .d, $(SRC_FILES)))
 OBJ = $(addprefix build/, $(addsuffix .o, $(SRC_FILES)))
 SRC = $(addprefix src/, $(SRC_FILES))
@@ -11,11 +11,12 @@ CC = clang
 LD = ld.lld
 ASFLAGS = -f elf32 -Werror
 CFLAGS = -c -ffreestanding -fno-builtin -nostdlib -Wall -Wextra -Werror \
-		 -Wno-unused-parameter -std=c99 --target=i686-pc-none-elf -march=i686
+		 -Wno-unused-parameter -Iinclude/ -std=c99 --target=i686-pc-none-elf \
+		 -march=i686
 LDFLAGS = -T link.ld -melf_i386
 
 ifdef DEBUG
-	CFLAGS += -DDEBUG
+	CFLAGS += -DDEBUG=$(DEBUG)
 endif
 
 .PHONY: clean run

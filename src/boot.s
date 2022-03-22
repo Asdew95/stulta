@@ -5,6 +5,11 @@ extern kernel_pd
 extern paging_enable
 extern paging_set_cr3
 
+extern kpstart
+extern kvstart
+extern kpend
+extern kvend
+
 MAGIC_NUMBER equ 0x1badb002
 FLAGS equ 0
 CHECKSUM equ -MAGIC_NUMBER
@@ -30,6 +35,9 @@ asentry:
     or eax, 0x00000010
     mov cr4, eax
 
+    mov esp, kernel_stack + KERNEL_STACK_SIZE - 0xfe000000 ; Lower-half stack
+    push ebx
+
     ; Map 4 MiB from 0xfe000000 and 0x00000000 to 0x00000000
     mov eax, 0x00000083
     mov ebx, kernel_pd - 0xfe000000
@@ -37,17 +45,19 @@ asentry:
     add ebx, 4064
     mov [ebx], eax
 
-    mov esp, kernel_stack + KERNEL_STACK_SIZE - 0xfe000000 ; Lower-half stack
     push kernel_pd - 0xfe000000
     call paging_set_cr3
     lea eax, [.higher_half]
+    add esp, 4
     push eax
     jmp paging_enable
 
     .higher_half:
-    mov esp, kernel_stack + KERNEL_STACK_SIZE ; Higher-half stack
-    mov al, '!'
-    mov [0xb8000], al
+    add esp, 0xfe000000 ; Higher-half stack
+    push kvend
+    push kpend
+    push kvstart
+    push kpstart
     call kentry
     .loop:
     jmp .loop

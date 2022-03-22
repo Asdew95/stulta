@@ -3,6 +3,9 @@ ENTRY(asentry)
 SECTIONS {
     . = 0xfe100000;
 
+    kvstart = .;
+    kpstart = . - 0xfe000000;
+
     .text ALIGN (0x1000) : AT(ADDR(.text) - 0xfe000000)
     {
         *(.text)
@@ -23,4 +26,7 @@ SECTIONS {
         *(COMMON)
         *(.bss)
     }
+
+    kvend = .;
+    kpend = . - 0xfe000000;
 }

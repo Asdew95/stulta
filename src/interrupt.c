@@ -16,6 +16,4 @@ void interrupt(struct cpu_state cpu, uint32_t interrupt,
             fb[0] = inb(0x60);
         }
     }
-
-
 }
