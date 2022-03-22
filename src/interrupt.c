@@ -1,3 +1,4 @@
+#include "debug.h"
 #include "interrupt.h"
 #include "io.h"
 #include "pic.h"
@@ -15,5 +16,9 @@ void interrupt(struct cpu_state cpu, uint32_t interrupt,
             char *fb = (char*) 0xb8000;
             fb[0] = inb(0x60);
         }
+    } else {
+        dbg_print("INT: ");
+        dbg_print_uint32(interrupt);
+        dbg_print("\n");
     }
 }

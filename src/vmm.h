@@ -1,6 +1,7 @@
 #ifndef VMM_H
 #define VMM_H
 
+#include <stddef.h>
 #include <stdint.h>
 
 union pde {
@@ -52,6 +53,9 @@ struct pte {
 extern union pde kernel_pd[1024];
 
 void vmm_init(void);
+
+void *vmm_alloc_pages(size_t pages);
+void vmm_free_pages(void *ptr, size_t pages);
 
 extern void paging_set_cr3(uint32_t cr3);
 extern void paging_enable(void);
