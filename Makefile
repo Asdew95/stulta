@@ -1,5 +1,5 @@
 SRC_FILES = boot.s gdt.c gdt.s idt.c idt.s interrupt.c interrupt.s io.s \
-			kentry.c liballoc.c pic.c pmm.c vmm.c vmm.s
+			kentry.c libk/liballoc.c libk/util.c pic.c pmm.c vmm.c vmm.s
 DEPS = $(addprefix build/, $(addsuffix .d, $(SRC_FILES)))
 OBJ = $(addprefix build/, $(addsuffix .o, $(SRC_FILES)))
 SRC = $(addprefix src/, $(SRC_FILES))
@@ -37,11 +37,11 @@ $(KERNEL_ELF): $(OBJ) link.ld
 -include $(DEPS)
 
 build/%.s.o: src/%.s
-	@mkdir -p build
+	@mkdir -p $(@D)
 	$(AS) $(ASFLAGS) -MD -MP -MF build/$*.s.d $< -o $@
 
 build/%.c.o: src/%.c
-	@mkdir -p build
+	@mkdir -p $(@D)
 	$(CC) $(CFLAGS) -MMD -MP $< -o $@
 
 run: $(OUT)

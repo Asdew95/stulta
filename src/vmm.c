@@ -1,4 +1,5 @@
 #include "debug.h"
+#include "libk/util.h"
 #include "pmm.h"
 #include <stddef.h>
 #include "vmm.h"
@@ -77,10 +78,7 @@ end:
             pde->small.present = 1;
 
             // Zero out the memory
-            char *arr = (char*) pt;
-            for (int z = 0; z < 4096; z++) {
-                arr[z] = 0;
-            }
+            memset(pt, 0, 4096);
         }
 
         for (int j = (i == 0) ? curstart % 1024 : 0;

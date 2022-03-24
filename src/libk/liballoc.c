@@ -4,7 +4,7 @@
  */
 
 #include "liballoc.h"
-#include "vmm.h"
+#include "../vmm.h"
 
 /**  Durand's Ridiculously Amazing Super Duper Memory functions.  */
 
