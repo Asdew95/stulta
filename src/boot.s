@@ -35,17 +35,17 @@ asentry:
     or eax, 0x00000010
     mov cr4, eax
 
-    mov esp, kernel_stack + KERNEL_STACK_SIZE - 0xfe000000 ; Lower-half stack
+    mov esp, kernel_stack + KERNEL_STACK_SIZE - 0xf0000000 ; Lower-half stack
     push ebx
 
-    ; Map 4 MiB from 0xfe000000 and 0x00000000 to 0x00000000
+    ; Map 4 MiB from 0xf0000000 and 0x00000000 to 0x00000000
     mov eax, 0x00000083
-    mov ebx, kernel_pd - 0xfe000000
+    mov ebx, kernel_pd - 0xf0000000
     mov [ebx], eax
-    add ebx, 4064
+    add ebx, 3840
     mov [ebx], eax
 
-    push kernel_pd - 0xfe000000
+    push kernel_pd - 0xf0000000
     call paging_set_cr3
     lea eax, [.higher_half]
     add esp, 4
@@ -53,7 +53,7 @@ asentry:
     jmp paging_enable
 
     .higher_half:
-    add esp, 0xfe000000 ; Higher-half stack
+    add esp, 0xf0000000 ; Higher-half stack
     push kvend
     push kpend
     push kvstart
