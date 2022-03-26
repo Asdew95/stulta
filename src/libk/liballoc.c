@@ -446,7 +446,7 @@ int liballoc_unlock()
 
 void *liballoc_alloc(int pages)
 {
-    return vmm_alloc_pages(pages);
+    return vmm_alloc_pages(pages, 0);
 }
 
 int liballoc_free(void* ptr, int pages)

@@ -54,10 +54,12 @@ extern union pde kernel_pd[1024];
 
 void vmm_init(void);
 
-void *vmm_alloc_pages(size_t pages);
+void *vmm_alloc_pages(size_t pages, int user);
 void vmm_free_pages(void *ptr, size_t pages);
 
 extern void paging_set_cr3(uint32_t cr3);
 extern void paging_enable(void);
+extern void flush_tlb(void);
+extern void invlpg(uint32_t addr);
 
 #endif

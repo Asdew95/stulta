@@ -10,9 +10,9 @@ AS = nasm
 CC = clang
 LD = ld.lld
 ASFLAGS = -f elf32 -Werror
-CFLAGS = -c -ffreestanding -fno-builtin -nostdlib -Wall -Wextra -Werror \
-		 -Wno-unused-parameter -Iinclude/ -std=c99 --target=i686-pc-none-elf \
-		 -march=i686
+CFLAGS = -c -ffreestanding -fno-builtin -nostdlib -mno-red-zone -Wall -Wextra \
+		 -Werror -Wno-unused-parameter -Iinclude/ -std=c99 \
+		 --target=i686-pc-none-elf -march=i686
 LDFLAGS = -T link.ld -melf_i386
 
 ifdef DEBUG

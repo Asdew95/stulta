@@ -24,7 +24,7 @@ void kentry(uint32_t kpstart, uint32_t kvstart, uint32_t kpend, uint32_t kvend,
     gdt_init();
     idt_init();
     pic_init();
-    interrupts_enable();
-    vmm_init();
     pmm_init();
+    vmm_init();
+    interrupts_enable();
 }
