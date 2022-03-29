@@ -47,8 +47,8 @@ struct task *task_new(void *code, size_t csize)
     task->cpu.edx = 0;
     task->cpu.ebp = 0;
     task->cpu.esi = 0;
-    task->cpu.edi = 0x12345678;
-    task->cpu.eflags = 0;
+    task->cpu.edi = 0;
+    task->cpu.eflags = 0x202;
     task->cpu.esp = 0; // Will be set in task_switch if 0
 
     task->pd = vmm_alloc_pages(kernel.pd, 1, 0);
@@ -75,8 +75,8 @@ void task_switch(struct task *task)
     tss.esp0 = task->kernel_stack;
 
     if (task->cpu.esp == 0) {
-        task->cpu.esp = (uint32_t) vmm_alloc_pages(kernel.pd, 1, 1);
-        memset((void*) task->cpu.esp, 0, 4096);
+        task->cpu.esp = (uint32_t) vmm_alloc_pages(kernel.pd, 1, 1) + 0x1000;
+        memset((void*) (task->cpu.esp - 0x1000), 0, 4096);
     }
 
     jump_ring3(*task);

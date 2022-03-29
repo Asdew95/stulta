@@ -161,6 +161,7 @@ void *vmm_copy_mapping(union pde *tgt, void *ptr, size_t pages, int deep,
 
                 pde->small.addr = paddr >> 12;
                 pde->small.present = 1;
+                pde->small.readwrite = user;
 
                 // Zero out the memory
                 memset(tgtpt, 0, 4096);
@@ -174,6 +175,7 @@ void *vmm_copy_mapping(union pde *tgt, void *ptr, size_t pages, int deep,
                     (struct pte*) (0xffc00000 + (srcpage * 4));
                 tgtpt[j] = *srcpte;
                 tgtpt[j].supervisor = user;
+                tgtpt[j].readwrite = user;
                 srcpage++;
             }
         } else {
@@ -182,6 +184,7 @@ void *vmm_copy_mapping(union pde *tgt, void *ptr, size_t pages, int deep,
 
             *tgtpde = *srcpde;
             tgtpde->small.supervisor = user;
+            tgtpde->small.readwrite = user;
         }
     }
 
@@ -216,6 +219,7 @@ void *vmm_alloc_pages(union pde *pd, size_t pages, int user)
             pde->small.addr = paddr >> 12;
             pde->small.supervisor = user;
             pde->small.present = 1;
+            pde->small.readwrite = user;
 
             // Zero out the memory
             memset(pt, 0, 4096);
@@ -231,6 +235,7 @@ void *vmm_alloc_pages(union pde *pd, size_t pages, int user)
 
             pt[j].addr = paddr >> 12;
             pt[j].supervisor = user;
+            pt[j].readwrite = user;
             pt[j].present = 1;
             invlpg(i * 1024 * 4096 + j * 4096);
         }

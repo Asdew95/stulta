@@ -16,11 +16,12 @@ jump_ring3:
     push 0x23
     mov eax, [esp + 16]
     push eax
-    pushf
+    mov eax, [esp + 28]
+    push eax
     push 0x1b
     mov eax, [esp + 32]
     push eax
-    add esp, 40
+    add esp, 44
     pop eax
     pop ebx
     pop ecx
@@ -28,6 +29,5 @@ jump_ring3:
     pop ebp
     pop esi
     pop edi
-    popf
     sub esp, 72
     iret
