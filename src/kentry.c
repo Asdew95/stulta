@@ -5,6 +5,7 @@
 #include "pic.h"
 #include "pmm.h"
 #include "stulta.h"
+#include "task.h"
 #include "vmm.h"
 
 struct kernel_info kernel;
@@ -20,6 +21,8 @@ void kentry(uint32_t kpstart, uint32_t kvstart, uint32_t kpend, uint32_t kvend,
     kernel.kvstart = kvstart;
     kernel.kpend = kpend;
     kernel.kvend = kvend;
+    kernel.pd = kernel_pd;
+    kernel.ppd = (uint32_t) kernel_pd - 0xf0000000;
 
     gdt_init();
     idt_init();
@@ -27,4 +30,5 @@ void kentry(uint32_t kpstart, uint32_t kvstart, uint32_t kpend, uint32_t kvend,
     pmm_init();
     vmm_init();
     interrupts_enable();
+    task_init();
 }

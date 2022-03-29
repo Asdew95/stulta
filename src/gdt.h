@@ -18,7 +18,7 @@ struct gdt_entry {
 } __attribute__((packed));
 
 extern struct gdt gdt;
-extern struct gdt_entry gdt_entries[3];
+extern struct gdt_entry gdt_entries[6];
 
 void gdt_init(void);
 

@@ -20,6 +20,10 @@ extern struct kernel_info {
     uint32_t kvstart;
     uint32_t kpend;
     uint32_t kvend;
+
+    union pde *pd;
+    // ppd is the physical address of pd
+    uint32_t ppd;
 } kernel;
 
 #endif

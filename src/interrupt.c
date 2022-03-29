@@ -13,7 +13,7 @@ void interrupt(struct cpu_state cpu, uint32_t interrupt,
         pic_eoi(irq);
 
         if (irq == 1) { // Keyboard
-            char *fb = (char*) 0xb8000;
+            char *fb = (char*) 0xf00b8000;
             fb[0] = inb(0x60);
         }
     } else {

@@ -1,15 +1,20 @@
 #include "gdt.h"
 #include <stdint.h>
+#include "task.h"
 
-struct gdt_entry gdt_entries[3];
+struct gdt_entry gdt_entries[6];
 
 void gdt_init(void)
 {
     gdt_entries[0] = create_gdt_desc(0, 0, 0, 0);
     gdt_entries[1] = create_gdt_desc(0, 0xfffff, 0x9a, 0xcf);
     gdt_entries[2] = create_gdt_desc(0, 0xfffff, 0x92, 0xcf);
+    gdt_entries[3] = create_gdt_desc(0, 0xfffff, 0xfa, 0xcf);
+    gdt_entries[4] = create_gdt_desc(0, 0xfffff, 0xf2, 0xcf);
+    gdt_entries[5] = create_gdt_desc((uint32_t) &tss, sizeof(struct tss), 0x89,
+            0x00);
 
-    gdt = (struct gdt) { .address = (uint32_t) gdt_entries, .size = 3 * 8 - 1};
+    gdt = (struct gdt) { .address = (uint32_t) gdt_entries, .size = 6 * 8 - 1};
     gdt_load();
 }
 

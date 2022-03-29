@@ -1,5 +1,6 @@
 SRC_FILES = boot.s gdt.c gdt.s idt.c idt.s interrupt.c interrupt.s io.s \
-			kentry.c libk/liballoc.c libk/util.c pic.c pmm.c vmm.c vmm.s
+			kentry.c libk/liballoc.c libk/util.c pic.c pmm.c task.c task.s \
+			vmm.c vmm.s
 DEPS = $(addprefix build/, $(addsuffix .d, $(SRC_FILES)))
 OBJ = $(addprefix build/, $(addsuffix .o, $(SRC_FILES)))
 SRC = $(addprefix src/, $(SRC_FILES))

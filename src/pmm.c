@@ -77,7 +77,8 @@ void pmm_init()
                 if (!is_page_kreserved(j)) {
                     current_block_size++;
                     if (current_block_size * 4096 >= free_memory * 4) {
-                        kernel.memory.free_pages = (uint32_t*) current_block;
+                        kernel.memory.free_pages = (uint32_t*) (current_block
+                            + 0xf0000000); // TODO: map virtual memory
                         goto stack_found;
                     }
                 } else {
