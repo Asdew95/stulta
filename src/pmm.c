@@ -1,4 +1,5 @@
 #include "debug.h"
+#include "interrupt.h"
 #include <multiboot.h>
 #include "pmm.h"
 #include <stdint.h>
@@ -151,19 +152,29 @@ static int is_page_kreserved(uint32_t address)
 
 uint32_t pmm_page_alloc(void)
 {
+    noint_start();
+
     if (kernel.memory.free_memory == 0) {
         return INVALID_PADDRESS;
     }
 
-    return kernel.memory.free_pages[--kernel.memory.free_memory];
+    uint32_t page = kernel.memory.free_pages[--kernel.memory.free_memory];
+
+    noint_end();
+
+    return page;
 }
 
 void pmm_page_free(uint32_t addr)
 {
+    noint_start();
+
     if (addr == INVALID_PADDRESS) {
         return;
     }
 
     kernel.memory.free_pages[kernel.memory.free_memory++] =
         align_ptr_down(addr);
+
+    noint_end();
 }

@@ -4,20 +4,21 @@
 #include <stdint.h>
 
 struct cpu_state {
-	uint32_t edi;
-	uint32_t esi;
-	uint32_t ebp;
-	uint32_t edx;
-	uint32_t ecx;
-	uint32_t ebx;
+    uint32_t edi;
+    uint32_t esi;
+    uint32_t ebp;
+    uint32_t edx;
+    uint32_t ecx;
+    uint32_t ebx;
+    uint32_t esp;
     uint32_t eax;
 } __attribute__((packed));
 
 struct stack_state {
-	uint32_t error_code;
-	uint32_t eip;
-	uint32_t cs;
-	uint32_t eflags;
+    uint32_t error_code;
+    uint32_t eip;
+    uint32_t cs;
+    uint32_t eflags;
 } __attribute__((packed));
 
 void interrupt(struct cpu_state cpu, uint32_t interrupt,
@@ -25,6 +26,9 @@ void interrupt(struct cpu_state cpu, uint32_t interrupt,
 
 void interrupts_enable(void);
 void interrupts_disable(void);
+
+void noint_start(void);
+void noint_end(void);
 
 extern void interrupt_handler_0();
 extern void interrupt_handler_1();
@@ -62,5 +66,6 @@ extern void interrupt_handler_44();
 extern void interrupt_handler_45();
 extern void interrupt_handler_46();
 extern void interrupt_handler_47();
+extern void interrupt_handler_128();
 
 #endif

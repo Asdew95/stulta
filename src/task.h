@@ -21,7 +21,11 @@ struct task {
         uint32_t edi;
     } __attribute__((packed)) cpu;
     uint32_t kernel_stack;
-};
+
+    int ring;
+
+    struct task *next;
+} __attribute__((packed));
 
 struct tss {
 	uint32_t prev_tss;

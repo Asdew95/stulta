@@ -23,12 +23,14 @@ void kentry(uint32_t kpstart, uint32_t kvstart, uint32_t kpend, uint32_t kvend,
     kernel.kvend = kvend;
     kernel.pd = kernel_pd;
     kernel.ppd = (uint32_t) kernel_pd - 0xf0000000;
+    kernel.task = NULL;
+    kernel.int_disable = 1;
 
     gdt_init();
     idt_init();
     pic_init();
     pmm_init();
     vmm_init();
-    interrupts_enable();
     task_init();
+    noint_end();
 }

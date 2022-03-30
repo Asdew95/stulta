@@ -20,12 +20,25 @@ interrupt_handler_%1:
 
 common_interrupt_handler:
     push eax
+    mov eax, [esp + 16] ; CS
+    cmp eax, 0x08
+    je .b
+    ; Interrupt from user mode
+    mov eax, [esp + 24]
+    push eax
+    jmp .c
+    .b:
+    ; Interrupt from within the kernel
+    lea eax, [esp + 24]
+    push eax
+    .c:
     push ebx
     push ecx
     push edx
     push ebp
     push esi
     push edi
+
     call interrupt
 
     pop edi
@@ -34,6 +47,7 @@ common_interrupt_handler:
     pop edx
     pop ecx
     pop ebx
+    add esp, 4
     pop eax
     add esp, 8
     iret
@@ -82,3 +96,4 @@ no_error_code_interrupt_handler 44
 no_error_code_interrupt_handler 45
 no_error_code_interrupt_handler 46
 no_error_code_interrupt_handler 47
+no_error_code_interrupt_handler 128

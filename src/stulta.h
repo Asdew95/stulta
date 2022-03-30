@@ -4,6 +4,7 @@
 #include <multiboot.h>
 #include <stddef.h>
 #include <stdint.h>
+#include "task.h"
 
 extern struct kernel_info {
     multiboot_info_t *mb_info;
@@ -21,9 +22,13 @@ extern struct kernel_info {
     uint32_t kpend;
     uint32_t kvend;
 
+    int int_disable;
+
     union pde *pd;
     // ppd is the physical address of pd
     uint32_t ppd;
+
+    struct task *task;
 } kernel;
 
 #endif

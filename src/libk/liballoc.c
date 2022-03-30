@@ -4,6 +4,7 @@
  */
 
 #include "liballoc.h"
+#include "../interrupt.h"
 #include "../vmm.h"
 
 /**  Durand's Ridiculously Amazing Super Duper Memory functions.  */
@@ -434,13 +435,15 @@ void*   realloc(void *p, size_t size)
 
 int liballoc_lock()
 {
-    __asm__("cli");
+    noint_start();
+
     return 0;
 }
 
 int liballoc_unlock()
 {
-    __asm__("sti");
+    noint_end();
+
     return 0;
 }
 

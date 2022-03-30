@@ -1,5 +1,6 @@
 global flush_tss
 global jump_ring3
+global jump_r0_task
 
 flush_tss:
     mov ax, 0x28
@@ -30,4 +31,30 @@ jump_ring3:
     pop esi
     pop edi
     sub esp, 72
+    iret
+
+jump_r0_task:
+    mov ebx, [esp + 4]
+    add ebx, 8
+    mov esp, [ebx]
+
+    mov eax, [ebx + 8]
+    push eax
+    push 0x08
+    mov eax, [ebx + 4]
+    push eax
+
+    mov esp, ebx
+    add esp, 12
+    pop eax
+    pop ebx
+    pop ecx
+    pop edx
+    pop ebp
+    pop esi
+    pop edi
+
+    sub esp, 40
+    mov esp, [esp]
+    sub esp, 12
     iret

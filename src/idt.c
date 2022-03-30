@@ -43,9 +43,10 @@ void idt_init(void)
     IDT_GATE_DEFAULT(45)
     IDT_GATE_DEFAULT(46)
     IDT_GATE_DEFAULT(47)
+    idt_set_gate(0x80, (uint32_t) interrupt_handler_128, 0x08, IDT_ATTR_PRESENT | IDT_ATTR_DPL_3 | IDT_ATTR_TRAP_GATE);
 
     idt.address = (uint32_t) idt_entries;
-    idt.size = 8 * 48 - 1;
+    idt.size = 8 * 0x81 - 1;
     idt_load();
 }
 

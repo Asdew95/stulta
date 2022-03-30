@@ -1,3 +1,4 @@
+#include "interrupt.h"
 #include "libk/util.h"
 #include "pmm.h"
 #include <stddef.h>
@@ -111,13 +112,17 @@ static uint32_t find_vspace(union pde *pd, size_t pages, int user,
 void *vmm_copy_mapping(union pde *tgt, void *ptr, size_t pages, int deep,
         int user)
 {
+    noint_start();
+
     size_t size;
     uint32_t start;
 
-    if (!deep) {
+    if (deep) {
         start = find_vspace(tgt, pages, user, &size);
 
         if (size == 0) {
+            noint_end();
+
             return NULL;
         }
 
@@ -139,13 +144,15 @@ void *vmm_copy_mapping(union pde *tgt, void *ptr, size_t pages, int deep,
     }
 
     if (size == 0) {
+        noint_end();
+
         return NULL;
     }
 
     change_recursive_pd(vmm_vtop(NULL, tgt));
 
     uint32_t srcpage = (uint32_t) ptr / 4096;
-    for (int i = 0; (size_t) i < start / 1024 + pages % 1024 > 0 ? 1 : 0; i++)
+    for (int i = 0; (size_t) i < size / 1024 + ((pages % 1024) > 0) ? 1 : 0; i++)
     {
         if (deep) {
             struct pte *tgtpt =
@@ -156,12 +163,15 @@ void *vmm_copy_mapping(union pde *tgt, void *ptr, size_t pages, int deep,
                 uint32_t paddr = pmm_page_alloc();
                 if (paddr == INVALID_PADDRESS) {
                     // Out of memory
+                    noint_end();
+
                     return NULL;
                 }
 
                 pde->small.addr = paddr >> 12;
                 pde->small.present = 1;
                 pde->small.readwrite = user;
+                invlpg((uint32_t) tgtpt);
 
                 // Zero out the memory
                 memset(tgtpt, 0, 4096);
@@ -188,17 +198,22 @@ void *vmm_copy_mapping(union pde *tgt, void *ptr, size_t pages, int deep,
         }
     }
 
+    noint_end();
+
     return (void*) (start * 4096);
 }
 
 void *vmm_alloc_pages(union pde *pd, size_t pages, int user)
 {
+    noint_start();
+
     size_t rpages = pages;
 
     size_t size;
     uint32_t start = find_vspace(pd, pages, user, &size);
 
     if (size == 0) {
+        noint_end();
         return NULL;
     }
 
@@ -207,12 +222,14 @@ void *vmm_alloc_pages(union pde *pd, size_t pages, int user)
     for (int i = 0; rpages > 0; i++) {
         union pde *pde = &pd[i + start / 1024];
         struct pte *pt =
-            (struct pte*) (0xffc00000 + (i + start / 1024) * 4096);
+            (struct pte*) (0xff800000 + (i + start / 1024) * 4096);
 
         if (!pde->small.present) {
             uint32_t paddr = pmm_page_alloc();
             if (paddr == INVALID_PADDRESS) {
                 // Out of memory
+                noint_end();
+
                 return NULL;
             }
 
@@ -230,6 +247,8 @@ void *vmm_alloc_pages(union pde *pd, size_t pages, int user)
             uint32_t paddr = pmm_page_alloc();
             if (paddr == INVALID_PADDRESS) {
                 // Out of memory
+                noint_end();
+
                 return NULL;
             }
 
@@ -241,11 +260,15 @@ void *vmm_alloc_pages(union pde *pd, size_t pages, int user)
         }
     }
 
+    noint_end();
+
     return (void*) (start * 4096);
 }
 
 void vmm_free_pages(void *ptr, size_t pages)
 {
+    noint_start();
+
     uint32_t page = (uint32_t) ptr / 4096;
     size_t rpages = pages;
     for (int i = 0; (size_t) i < page / 1024 + pages % 1024 > 0 ? 1 : 0; i++) {
@@ -258,6 +281,8 @@ void vmm_free_pages(void *ptr, size_t pages)
             pmm_page_free(pt[j].addr << 12);
         }
     }
+
+    noint_end();
 }
 
 uint32_t vmm_vtop(union pde *pd, void *addr)
