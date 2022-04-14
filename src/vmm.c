@@ -31,7 +31,7 @@ void vmm_init(void)
     flush_tlb();
 
     // Change the first 4 MiB of the higher-half kernel to use 4-KiB pages
-    struct pte *pt0 = vmm_alloc_pages(kernel.pd, 1, 0);
+    struct pte *pt0 = vmm_alloc_pages(kernel.pd, 0, 1, 0);
     memset(pt0, 0, 4096);
     for (int i = 0; i < 1024; i++) {
         pt0[i].addr = (i * 4096) >> 12;
@@ -109,16 +109,17 @@ static uint32_t find_vspace(union pde *pd, size_t pages, int user,
     return 0;
 }
 
-void *vmm_copy_mapping(union pde *tgt, void *ptr, size_t pages, int deep,
-        int user)
+void *vmm_copy_mapping(union pde *tgt, void *ptr, uint32_t start, size_t pages,
+        int deep, int user)
 {
     noint_start();
 
-    size_t size;
-    uint32_t start;
+    size_t size = pages;
 
     if (deep) {
-        start = find_vspace(tgt, pages, user, &size);
+        if (start == 0) {
+            start = find_vspace(tgt, pages, user, &size);
+        }
 
         if (size == 0) {
             noint_end();
@@ -126,8 +127,9 @@ void *vmm_copy_mapping(union pde *tgt, void *ptr, size_t pages, int deep,
             return NULL;
         }
 
-    } else {
+    } else if (start == 0) {
         size = 0;
+
         for (int i = (user ? 1 : 960); i < (user ? 960 : 1022); i++) {
             if (!tgt[i].huge.present) {
                 if (size == 0) {
@@ -203,14 +205,17 @@ void *vmm_copy_mapping(union pde *tgt, void *ptr, size_t pages, int deep,
     return (void*) (start * 4096);
 }
 
-void *vmm_alloc_pages(union pde *pd, size_t pages, int user)
+// start is assumed to be valid if start != 0
+void *vmm_alloc_pages(union pde *pd, uint32_t start, size_t pages, int user)
 {
     noint_start();
 
     size_t rpages = pages;
+    size_t size = rpages;
 
-    size_t size;
-    uint32_t start = find_vspace(pd, pages, user, &size);
+    if (start == 0) {
+        start = find_vspace(pd, pages, user, &size);
+    }
 
     if (size == 0) {
         noint_end();
@@ -265,7 +270,7 @@ void *vmm_alloc_pages(union pde *pd, size_t pages, int user)
     return (void*) (start * 4096);
 }
 
-void vmm_free_pages(void *ptr, size_t pages)
+void vmm_unmap(void *ptr, size_t pages, int free)
 {
     noint_start();
 
@@ -278,7 +283,9 @@ void vmm_free_pages(void *ptr, size_t pages)
                 j++, rpages--) {
             pt[j].present = 0;
             invlpg(i * 4096 * 1024 + j * 4096);
-            pmm_page_free(pt[j].addr << 12);
+            if (free) {
+                pmm_page_free(pt[j].addr << 12);
+            }
         }
     }
 
@@ -323,6 +330,6 @@ static void change_recursive_pd(uint32_t pd)
     kernel.pd[1022].small.pagesize = 0;
     kernel.pd[1022].small.present = 1;
     for (int i = 0; i < 1024; i++) {
-        invlpg(0xff800000 - 4096 * i);
+        invlpg(0xff800000 + 4096 * i);
     }
 }

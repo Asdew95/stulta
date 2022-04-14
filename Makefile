@@ -1,4 +1,4 @@
-SRC_FILES = boot.s gdt.c gdt.s idt.c idt.s interrupt.c interrupt.s io.s \
+SRC_FILES = boot.s elf.c gdt.c gdt.s idt.c idt.s interrupt.c interrupt.s io.s \
 			kentry.c libk/liballoc.c libk/util.c pic.c pmm.c task.c task.s \
 			vmm.c vmm.s
 DEPS = $(addprefix build/, $(addsuffix .d, $(SRC_FILES)))

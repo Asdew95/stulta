@@ -8,6 +8,7 @@ flush_tss:
     ret
 
 jump_ring3:
+    xchg bx, bx
     mov ax, 0x23
     mov ds, ax
     mov es, ax

@@ -1,3 +1,4 @@
+#include "elf.h"
 #include "interrupt.h"
 #include "libk/liballoc.h"
 #include "libk/util.h"
@@ -28,12 +29,14 @@ void task_init(void)
         for (int i = 0; i < (int) kernel.mb_info->mods_count; i++) {
             multiboot_module_t module = modules[i];
             // Allocate space for the module
-            void *modm = vmm_alloc_pages(kernel.pd,
+            void *modm = vmm_alloc_pages(kernel.pd, 0,
                 (module.mod_end - module.mod_start + 4095) / 4096, 0);
             memcpy(modm, (void*) module.mod_start,
                     (module.mod_end - module.mod_start));
 
-            task_new(modm, (module.mod_end - module.mod_start
+            /* task_new(modm, (module.mod_end - module.mod_start */
+            /*             + 4095) / 4096); */
+            elf_create_task(modm, (module.mod_end - module.mod_start
                         + 4095) / 4096);
         }
 
@@ -56,7 +59,7 @@ struct task *task_new(void *code, size_t csize)
     task->cpu.eflags = 0x202;
     task->cpu.esp = 0; // Will be set in task_switch if 0
 
-    task->pd = vmm_alloc_pages(kernel.pd, 1, 0);
+    task->pd = vmm_alloc_pages(kernel.pd, 0, 1, 0);
     task->ppd = vmm_vtop(NULL, task->pd);
 
     task->ring = 3;
@@ -65,9 +68,11 @@ struct task *task_new(void *code, size_t csize)
     memcpy((void*) ((uint32_t) task->pd + 4 * 960),
             (void*) ((uint32_t) kernel.pd + 4 * 960), 64 * 4);
 
-    task->cpu.eip = (uint32_t) vmm_copy_mapping(task->pd, code, csize, 1, 1);
+    task->cpu.eip = (uint32_t) vmm_copy_mapping(task->pd, code, 0, csize, 1,
+            1);
 
-    task->kernel_stack = (uint32_t) vmm_alloc_pages(kernel.pd, 1, 0) + 0x1000;
+    task->kernel_stack = (uint32_t) vmm_alloc_pages(kernel.pd, 0, 1, 0)
+        + 0x1000;
 
     if (kernel.task == NULL) {
         kernel.task = task;
@@ -91,7 +96,8 @@ void task_switch(struct task *task)
     tss.esp0 = task->kernel_stack;
 
     if (task->cpu.esp == 0) {
-        task->cpu.esp = (uint32_t) vmm_alloc_pages(kernel.pd, 1, 1) + 0x1000;
+        task->cpu.esp = (uint32_t) vmm_alloc_pages(kernel.pd, 0, 1, 1)
+            + 0x1000;
         memset((void*) (task->cpu.esp - 0x1000), 0, 4096);
     }
 
