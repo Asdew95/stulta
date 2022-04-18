@@ -261,7 +261,7 @@ void *vmm_alloc_pages(union pde *pd, uint32_t start, size_t pages, int user)
             pt[j].supervisor = user;
             pt[j].readwrite = user;
             pt[j].present = 1;
-            invlpg(i * 1024 * 4096 + j * 4096);
+            invlpg((i + start / 1024) * 4096 * 1024 + j * 4096);
         }
     }
 
@@ -282,7 +282,7 @@ void vmm_unmap(void *ptr, size_t pages, int free)
         for (int j = (i == 0) ? page % 1024 : 0; j < 1024 && rpages > 0;
                 j++, rpages--) {
             pt[j].present = 0;
-            invlpg(i * 4096 * 1024 + j * 4096);
+            invlpg((i + page / 1024) * 4096 * 1024 + j * 4096);
             if (free) {
                 pmm_page_free(pt[j].addr << 12);
             }

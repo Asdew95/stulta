@@ -10,9 +10,9 @@
 struct task *elf_create_task(void *buf, size_t size)
 {
     struct elf_header *elf = (struct elf_header*) buf;
-    
+
     // Sanity checks
-    
+
     if (elf->ei_magic != ELF_MAGIC) {
         dbg_print("Wrong ELF magic! Got: ");
         dbg_print_uint32(elf->ei_magic);
